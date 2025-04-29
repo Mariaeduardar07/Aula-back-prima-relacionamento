@@ -1,8 +1,9 @@
 import UserModel from "../models/userModel.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 class AuthController {
-// Listar todos os usuários
+  // Listar todos os usuários
   async getAllUsers(req, res) {
     try {
       const users = await UserModel.findAll();
@@ -18,36 +19,88 @@ class AuthController {
 
       // Validação basica
       // Se não houver nome, email ou senha, retorna um erro 400
-        if (!name || !email || !password) {
-            return res.status(400).json({ error: "Os campos nome, email e senha são obrigatórios" });
-        }
+      if (!name || !email || !password) {
+        return res
+          .status(400)
+          .json({ error: "Os campos nome, email e senha são obrigatórios" });
+      }
 
-        // Verifica se o usuário já existe
-        const userExists = await UserModel.findByEmail(email);
-        if (userExists) {
-            return res.status(400).json({ error: "Email já cadastrado" });
-        }
+      // Verifica se o usuário já existe
+      const userExists = await UserModel.findByEmail(email);
+      if (userExists) {
+        return res.status(400).json({ error: "Email já cadastrado" });
+      }
 
-        // Hash da senha: Criptografa a senha
-        const hashedPassaword = await bcrypt.hash(password, 10);
+      // Hash da senha: Criptografa a senha
+      const hashedPassaword = await bcrypt.hash(password, 10);
 
-        // Cria objeto do usuário
-        const data = {
-            name,
-            email,
-            password: hashedPassaword,
-        };
+      // Cria objeto do usuário
+      const data = {
+        name,
+        email,
+        password: hashedPassaword,
+      };
 
-        // Cria o usuário 
-        const user = await UserModel.create(data);
+      // Cria o usuário
+      const user = await UserModel.create(data);
 
-        return res.status(201).json({
-            message: "Usuário criado com sucesso",
-            user,
-        });
+      return res.status(201).json({
+        message: "Usuário criado com sucesso",
+        user,
+      });
     } catch (error) {
-        console.error("Erro ao criar um novo usuário: ", error);
-        res.status(500).json({ error: "Erro ao criar um novo usuário" });
+      console.error("Erro ao criar um novo usuário: ", error);
+      res.status(500).json({ error: "Erro ao criar um novo usuário" });
+    }
+  }
+
+  async login(req, res) {
+    try {
+      const { email, password } = req.body;
+      // Validação basica
+      // Se não houver nome, email ou senha, retorna um erro 400
+      if (!email || !password) {
+        return res
+          .status(400)
+          .json({ error: "Os campos email e senha são obrigatórios!" });
+      }
+
+      // Verifica se o usuário já existe
+      const userExists = await UserModel.findByEmail(email);
+      if (!userExists) {
+        return res.status(401).json({ error: "Credenciais inválidas!" });
+      }
+
+      //Verificar senha
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        userExists.password
+      );
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: "Credenciais inválidas!" });
+      }
+
+      // Gerar token JWT
+      const token = jwt.sign(
+      {
+        id: userExists.id,
+        name: userExists.name,
+        email: userExists.email,
+      },
+      process.env.JWT_SECRET,
+    {
+      expiresIn: "24h",
+    }
+    );
+
+    return res.json({
+      message: "Login realizado com sucesso!", 
+      token,
+      userExists,
+    })
+    } catch (error) {
+      console.error("Erro ao fazer login: ", error)
+      res.status(500).json({ error: "Erro ao fazer login!" });
     }
   }
 }

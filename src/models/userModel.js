@@ -27,6 +27,8 @@ class UserModel {
         email,
       },
     });
+
+    return user;
   }
 
   // Criar um novo usuário
