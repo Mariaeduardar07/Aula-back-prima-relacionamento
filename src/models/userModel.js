@@ -19,6 +19,16 @@ class UserModel {
     return user;
   }
 
+  // Obter um usuário pelo email
+  // So funciona se o a coluna foi marcada como unique no banco de dados
+  async findByEmail(email) {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
   // Criar um novo usuário
   async create(data) {
     const user = await prisma.user.create({
@@ -44,8 +54,8 @@ class UserModel {
   async delete(id) {
     await prisma.user.delete({
       where: {
-        id: Number(id)
-      }
+        id: Number(id),
+      },
     });
 
     return true;
