@@ -4,6 +4,12 @@ class CardController {
   // GET /api/cartas
   // Obter todos os cards
   async getAllCards(req, res) {
+    const pagina = req.query.page;
+    console.log("pagina", pagina);
+
+    const limite = req.query.limit;
+    console.log("limite", limite);
+
     try {
       const card = await CardModel.findAll();
       res.json(card);
@@ -47,10 +53,19 @@ class CardController {
       } = req.body;
 
       // Verifica se o nome e o ano de lançamento foram fornecidos
-      if (!name || !rarity || !attackPoints || !defensePoints || !collectionId ) {
+      if (
+        !name ||
+        !rarity ||
+        !attackPoints ||
+        !defensePoints ||
+        !collectionId
+      ) {
         return res
           .status(400)
-          .json({ error: "Os campos nome, raridade, pontos de ataque, pontos de defesa e o id da coleção são obrigatórios" });
+          .json({
+            error:
+              "Os campos nome, raridade, pontos de ataque, pontos de defesa e o id da coleção são obrigatórios",
+          });
       }
 
       // Criar o nova carta
