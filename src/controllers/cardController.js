@@ -4,14 +4,18 @@ class CardController {
   // GET /api/cartas
   // Obter todos os cards
   async getAllCards(req, res) {
-    const pagina = req.query.page;
+    const raridade = req.query.raridade;
+    console.log("Raridade: ", raridade);
+
+    const ataque = req.query.ataque;
+   /* const pagina = req.query.page;
     console.log("pagina", pagina);
 
     const limite = req.query.limit;
-    console.log("limite", limite);
+    console.log("limite", limite);*/
 
     try {
-      const card = await CardModel.findAll();
+      const card = await CardModel.findAll(raridade, ataque);
       res.json(card);
     } catch (error) {
       console.error("Erro ao buscar carta:", error);
@@ -81,7 +85,6 @@ class CardController {
       if (!novaCarta) {
         return res.status(400).json({ error: "Erro ao criar carta" });
       }
-
       res.status(201).json({
         message: "Carta criada com sucesso",
         novaCarta,
