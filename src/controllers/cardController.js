@@ -5,17 +5,17 @@ class CardController {
   // Obter todos os cards
   async getAllCards(req, res) {
     const raridade = req.query.raridade;
-    console.log("Raridade: ", raridade);
-
-    const ataque = req.query.ataque;
-   /* const pagina = req.query.page;
+    const ataque = req.query.ataque || 1;
+    const pagina = req.query.pagina || 10;
+    const limite = 2;
+    /* const pagina = req.query.page;
     console.log("pagina", pagina);
 
     const limite = req.query.limit;
     console.log("limite", limite);*/
 
     try {
-      const card = await CardModel.findAll(raridade, ataque);
+      const card = await CardModel.findAll(raridade, ataque, pagina, limite);
       res.json(card);
     } catch (error) {
       console.error("Erro ao buscar carta:", error);
@@ -64,12 +64,10 @@ class CardController {
         !defensePoints ||
         !collectionId
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Os campos nome, raridade, pontos de ataque, pontos de defesa e o id da coleção são obrigatórios",
-          });
+        return res.status(400).json({
+          error:
+            "Os campos nome, raridade, pontos de ataque, pontos de defesa e o id da coleção são obrigatórios",
+        });
       }
 
       // Criar o nova carta
