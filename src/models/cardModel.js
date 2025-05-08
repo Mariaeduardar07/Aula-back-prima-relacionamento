@@ -3,7 +3,21 @@ import prisma from "../../prisma/prisma.js";
 class CardModel {
   // Obter todos os cards
   async findAll() {
+    // Ratidade Ultra Rare
     const cartas = await prisma.card.findMany({
+      /* where: {
+        rarity: "Ultra Rare",   
+        }, */
+      /* where: {
+      attackPoints: {
+      Lte: 8000,   
+      },
+      }, */
+      /* where: {
+        attackPoints: {
+          gte: 8000,
+        },
+      }, */
       orderBy: {
         createdAt: "desc",
       },
@@ -16,7 +30,7 @@ class CardModel {
             name: true,
             description: true,
             releaseYear: true,
-          }
+          },
         },
       },
     });
@@ -88,11 +102,11 @@ class CardModel {
     if (rarity !== undefined) {
       data.rarity = rarity;
     }
-    if ( attackPoints !== undefined) {
+    if (attackPoints !== undefined) {
       data.attackPoints = attackPoints;
     }
-    if (  defensePoints !== undefined) {
-      data.defensePoints =  defensePoints;
+    if (defensePoints !== undefined) {
+      data.defensePoints = defensePoints;
     }
     if (imageUrl !== undefined) {
       data.imageUrl = imageUrl;
